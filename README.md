@@ -1,1 +1,1 @@
-# CipherGateVPN
+# CipherGate
