@@ -36,8 +36,8 @@ class MarzbanUserInfo(BaseModel):
 
     username: str
     status: str
-    expire: Optional[str]
     data_limit: Optional[int] = Field(0, description="Max data in bytes")
+    expire: Optional[str]
     used_traffic: Optional[int] = Field(0, description="Used traffic in bytes")
     lifetime_used_traffic: Optional[int] = Field(0)
     subscription_url: Optional[str] = None
