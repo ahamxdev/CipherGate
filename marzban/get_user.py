@@ -32,23 +32,32 @@ logger = logging.getLogger(__name__)
 
 # ---------- Models ----------
 class MarzbanUserInfo(BaseModel):
-    """Response model for GET /api/user/{username}"""
+    """Response model for GET /api/user/{username} (simplified, without lifetime fields)."""
 
+    id: Optional[int]
     username: str
     status: str
-    data_limit: Optional[int] = Field(0, description="Max data in bytes")
+    data_limit: Optional[int] = Field(0, description="Maximum data in bytes")
     expire: Optional[str]
     used_traffic: Optional[int] = Field(0, description="Used traffic in bytes")
-    lifetime_used_traffic: Optional[int] = Field(0)
+    created_at: Optional[str]
+    edit_at: Optional[str]
+    online_at: Optional[str]
     subscription_url: Optional[str] = None
 
+    # --- Derived properties for bot display ---
     @property
     def remaining_gb(self) -> float:
         """Return remaining traffic in GB (rounded to 2 decimals)."""
         if not self.data_limit:
             return 0
         remaining = self.data_limit - (self.used_traffic or 0)
-        return round(remaining / (1024**3), 2)
+        return round(max(remaining, 0) / (1024**3), 2)
+
+    @property
+    def used_gb(self) -> float:
+        """Return used traffic in GB (rounded to 2 decimals)."""
+        return round((self.used_traffic or 0) / (1024**3), 2)
 
     class Config:
         extra = "allow"
