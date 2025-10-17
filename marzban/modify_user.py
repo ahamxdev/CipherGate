@@ -137,6 +137,9 @@ async def modify_user(
         logger.warning(f"⚠️ Could not fetch current user data: {e}")
         current_proxy_settings = {}
 
+    if hasattr(current_proxy_settings, "model_dump"):
+        current_proxy_settings = current_proxy_settings.model_dump()
+
     # Prepare payload exactly like Marzban expects
     payload = {
         "username": username,
@@ -178,10 +181,10 @@ async def modify_user(
                 async with session.put(url, json=body, headers=headers) as resp:
                     data = await resp.json(content_type=None)
 
-                    data["data_limit_gb"] = data_limit_gb
 
                     if 200 <= resp.status < 300:
-                        logger.info("✅ Modified user %s (tier=%s, expire=%s)", username, tier, expire_date)
+                        data["data_limit_gb"] = data_limit_gb
+                        logger.info("✅ Modified user %s | Tier=%s | Data=%sGB | Expire=%s)", username, tier, data_limit_gb, expire_date)
                         return MarzbanUserResponse(**data)
 
                     elif resp.status == 401 and not force_refresh:
