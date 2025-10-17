@@ -23,6 +23,7 @@ from marzban.get_token import get_token
 from utils.config import settings
 from utils.time_utils import make_expire_date
 from utils.qrcode_utils import generate_qr_code
+from utils.byte_utils import gb_to_bytes
 
 logger = logging.getLogger(__name__)
 
@@ -119,7 +120,7 @@ async def create_user(
 
     # Compute dynamic fields
     username = f"CipherGate_{tier}_{user_id}"
-    data_limit_bytes = data_limit_gb * 1024**3
+    data_limit_bytes = gb_to_bytes(data_limit_gb)
     expire_date = make_expire_date(plan_days)
 
     # Build payload

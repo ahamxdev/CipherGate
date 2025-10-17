@@ -27,6 +27,7 @@ from pydantic import BaseModel, Field
 from marzban.get_token import get_token
 from utils.config import settings
 from utils.qrcode_utils import generate_qr_code
+from utils.byte_utils import bytes_to_gb
 
 logger = logging.getLogger(__name__)
 
@@ -54,21 +55,21 @@ class MarzbanUserInfo(BaseModel):
     # --- Derived properties for bot display ---
     @property
     def data_limit_gb(self) -> float:
-        """Return total data limit in GB (rounded to 2 decimals)."""
-        return round((self.data_limit or 0) / (1024**3), 2)
+        """Return total data limit in GB (rounded to 1 decimal)."""
+        return bytes_to_gb(self.data_limit or 0)
 
     @property
     def remaining_gb(self) -> float:
-        """Return remaining traffic in GB (rounded to 2 decimals)."""
+        """Return remaining traffic in GB (rounded to 1 decimal)."""
         if not self.data_limit:
-            return 0
+            return 0.0
         remaining = self.data_limit - (self.used_traffic or 0)
-        return round(max(remaining, 0) / (1024**3), 2)
+        return bytes_to_gb(max(remaining, 0))
 
     @property
     def used_gb(self) -> float:
-        """Return used traffic in GB (rounded to 2 decimals)."""
-        return round((self.used_traffic or 0) / (1024**3), 2)
+        """Return used traffic in GB (rounded to 1 decimal)."""
+        return bytes_to_gb(self.used_traffic or 0)
 
     # ---------- Derived Field ----------
     @property
