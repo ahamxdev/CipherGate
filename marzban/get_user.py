@@ -19,7 +19,7 @@ print(user.username, user.expire, user.remaining_gb)
 
 import asyncio
 import logging
-from typing import Optional
+from typing import Optional, Dict, Any
 
 import aiohttp
 from pydantic import BaseModel, Field
@@ -38,14 +38,24 @@ class MarzbanUserInfo(BaseModel):
     username: str
     status: str
     data_limit: Optional[int] = Field(0, description="Maximum data in bytes")
-    expire: Optional[str]
     used_traffic: Optional[int] = Field(0, description="Used traffic in bytes")
+    expire: Optional[str]
     created_at: Optional[str]
     edit_at: Optional[str]
     online_at: Optional[str]
     subscription_url: Optional[str] = None
+    # ✅ Added field: proxy_settings
+    proxy_settings: Optional[Dict[str, Dict[str, Any]]] = Field(
+        default_factory=dict,
+        description="Contains all VPN protocol settings (vmess, vless, trojan, shadowsocks)."
+    )
 
     # --- Derived properties for bot display ---
+    @property
+    def data_limit_gb(self) -> float:
+        """Return total data limit in GB (rounded to 2 decimals)."""
+        return round((self.data_limit or 0) / (1024**3), 2)
+
     @property
     def remaining_gb(self) -> float:
         """Return remaining traffic in GB (rounded to 2 decimals)."""
