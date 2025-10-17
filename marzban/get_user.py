@@ -26,6 +26,7 @@ from pydantic import BaseModel, Field
 
 from marzban.get_token import get_token
 from utils.config import settings
+from utils.qrcode_utils import generate_qr_code
 
 logger = logging.getLogger(__name__)
 
@@ -68,6 +69,29 @@ class MarzbanUserInfo(BaseModel):
     def used_gb(self) -> float:
         """Return used traffic in GB (rounded to 2 decimals)."""
         return round((self.used_traffic or 0) / (1024**3), 2)
+
+    # ---------- Derived Field ----------
+    @property
+    async def qr_image(self) -> Optional[bytes]:
+        """
+        Generate and return a QR code (PNG bytes) for the user's subscription URL.
+
+        Returns:
+            bytes | None: PNG bytes if subscription_url exists, otherwise None.
+        """
+        if not self.subscription_url:
+            return None
+
+        try:
+            return await generate_qr_code(self.subscription_url)
+        except aiohttp.ClientError as e:
+            logger.warning("⚠️ Network error while generating QR for %s: %s", self.username, e)
+        except asyncio.TimeoutError:
+            logger.warning("⚠️ Timeout while generating QR for %s", self.username)
+        except ValueError as e:
+            logger.warning("⚠️ Invalid subscription URL for %s: %s", self.username, e)
+        except OSError as e:
+            logger.warning("⚠️ File or I/O error while generating QR for %s: %s", self.username, e)
 
     class Config:
         extra = "allow"
