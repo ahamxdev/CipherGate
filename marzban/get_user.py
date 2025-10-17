@@ -172,16 +172,3 @@ async def get_user(
         raise RuntimeError(
             f"Failed to retrieve user '{username}' after {max_retries} attempts"
         ) from last_error
-
-
-# ---------- Example ----------
-# async def main():
-#     user = await get_user(user_id=123456, tier="vip")
-#     print(f"👤 Username: {user.username}")
-#     print(f"📅 Expire: {user.expire}")
-#     print(f"📦 Remaining: {user.remaining_gb} GB")
-#     print(f"🟢 Status: {user.status}")
-#     print(f"🔗 {user.subscription_url}")
-#
-# if __name__ == "__main__":
-#     asyncio.run(main())

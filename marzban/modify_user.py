@@ -24,7 +24,7 @@ from utils.config import settings
 from utils.time_utils import make_expire_date
 from marzban.get_user import get_user
 from utils.qrcode_utils import generate_qr_code
-from utils.byte_utils import bytes_to_gb
+from utils.byte_utils import bytes_to_gb, gb_to_bytes
 
 logger = logging.getLogger(__name__)
 
@@ -151,7 +151,7 @@ async def modify_user(
         raise ValueError(f"Invalid tier '{tier}'. Must be one of {list(group_map.keys())}")
 
     username = f"CipherGate_{tier}_{user_id}"
-    data_limit_bytes = data_limit_gb * 1024**3
+    data_limit_bytes = gb_to_bytes(data_limit_gb)
     expire_date = make_expire_date(plan_days)
 
     # --- Get current user info first ---

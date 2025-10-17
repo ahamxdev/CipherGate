@@ -159,14 +159,3 @@ async def revoke_user_sub(
                 await asyncio.sleep(backoff * attempt)
 
         raise RuntimeError(f"Failed to revoke subscription after {max_retries} attempts") from last_error
-
-
-# ---------- Example ----------
-# async def main():
-#     user = await revoke_user_sub(user_id=123456, tier="vip")
-#     qr_bytes = await user.qr_image()
-#     print(f"✅ New subscription: {user.subscription_url}")
-#     print(f"📦 Remaining: {user.remaining_gb} GB")
-#
-# if __name__ == "__main__":
-#     asyncio.run(main())
